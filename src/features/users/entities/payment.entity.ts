@@ -22,3 +22,4 @@ export class Payment {
   @CreateDateColumn({ name: 'ts' })
   ts: Date;
 }
+export { PaymentAction };

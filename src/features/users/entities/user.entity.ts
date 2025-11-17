@@ -1,10 +1,12 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
+import { Payment } from './payment.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -13,6 +15,9 @@ export class User {
 
   @Column('numeric', { precision: 12, scale: 2, default: 0 })
   balance: string;
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
