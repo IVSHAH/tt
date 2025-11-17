@@ -1,9 +1,8 @@
 import { IsEnum, IsNumber, IsPositive } from 'class-validator';
-
-export type PaymentAction = 'CREDIT' | 'DEBIT';
+import { PaymentAction } from '../../../common/enums/payment-action.enum';
 
 export class ChargeBalanceDto {
-  @IsEnum(['CREDIT', 'DEBIT'])
+  @IsEnum(PaymentAction)
   action: PaymentAction;
 
   @IsNumber({ maxDecimalPlaces: 2 })
