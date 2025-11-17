@@ -28,6 +28,8 @@
     "typeorm": "^0.3.27"
   },
   "scripts": {
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "start": "nest start",
+    "start:dev": "nest start --watch"
   }
 }
