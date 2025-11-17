@@ -5,7 +5,6 @@ import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import { ChargeBalanceDto } from './dto/charge-balance.dto';
 import { PaymentAction } from '../../common/enums/payment-action.enum';
-import { BALANCE_CACHE_TTL_SECONDS } from '../../common/constants/cache.constants';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +18,7 @@ export class UsersService {
   }
 
   async createUser(): Promise<User> {
+    // todo: просто для удобства чтобы через ручку сгенерить стартового пользователя
     const user = await this.usersRepository.createUser({
       balance: '0.00',
     });
@@ -44,7 +44,7 @@ export class UsersService {
       throw new BadRequestException('User not found');
     }
 
-    await this.cacheManager.set(cacheKey, user.balance, BALANCE_CACHE_TTL_SECONDS);
+    await this.cacheManager.set(cacheKey, user.balance);
 
     return {
       userId: user.id,

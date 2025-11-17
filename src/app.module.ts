@@ -9,7 +9,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.register({
       isGlobal: true,
-      ttl: 10,
+      ttl: 60000,
       max: 100,
     }),
     PostgresModule,

@@ -1,1 +1,0 @@
-export const BALANCE_CACHE_TTL_SECONDS = 60;
