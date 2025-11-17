@@ -1,22 +1,55 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { UsersRepository } from './users.repository';
+import { User } from './entities/user.entity';
 import { ChargeBalanceDto } from './dto/charge-balance.dto';
 import { PaymentAction } from '../../common/enums/payment-action.enum';
+import { BALANCE_CACHE_TTL_SECONDS } from '../../common/constants/cache.constants';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
+  ) {}
+
+  private getCacheKey(userId: number): string {
+    return `user:${userId}:balance`;
+  }
+
+  async createUser(): Promise<User> {
+    const user = await this.usersRepository.createUser({
+      balance: '0.00',
+    });
+
+    return user;
+  }
 
   async getBalance(userId: number) {
-    const user = await this.usersRepository.findUserById(userId);
+    const cacheKey = this.getCacheKey(userId);
 
+    const cachedBalance = await this.cacheManager.get<string>(cacheKey);
+
+    if (cachedBalance !== undefined && cachedBalance !== null) {
+      return {
+        userId,
+        balance: cachedBalance,
+        source: 'cache' as const,
+      };
+    }
+
+    const user = await this.usersRepository.findUserById(userId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
 
+    await this.cacheManager.set(cacheKey, user.balance, BALANCE_CACHE_TTL_SECONDS);
+
     return {
       userId: user.id,
       balance: user.balance,
+      source: 'db' as const,
     };
   }
 
@@ -38,6 +71,8 @@ export class UsersService {
       dto.action,
       dto.amount
     );
+
+    await this.cacheManager.del(this.getCacheKey(userId));
 
     return {
       userId: updatedUser.id,

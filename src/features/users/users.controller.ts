@@ -14,4 +14,14 @@ export class UsersController {
   charge(@Param('id', ParseIntPipe) id: number, @Body() dto: ChargeBalanceDto) {
     return this.usersService.charge(id, dto);
   }
+
+  @Post()
+  async createUser() {
+    const user = await this.usersService.createUser();
+
+    return {
+      id: user.id,
+      balance: user.balance,
+    };
+  }
 }

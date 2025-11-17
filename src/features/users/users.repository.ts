@@ -14,6 +14,11 @@ export class UsersRepository {
     private readonly dataSource: DataSource
   ) {}
 
+  async createUser(data: Partial<User>): Promise<User> {
+    const user = this.usersRepo.create(data);
+    return this.usersRepo.save(user);
+  }
+
   async findUserById(userId: number): Promise<User | null> {
     return this.usersRepo.findOne({ where: { id: userId } });
   }
